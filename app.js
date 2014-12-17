@@ -1,9 +1,11 @@
 var express = require('express'),
+    session = require('express-session'),
     path = require('path'),
     favicon = require('static-favicon'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
+    methodOverride = require('method-override'),
     passport = require('passport'),
     TwitterStrategy = require('passport-twitter'),
     FacebookStrategy = require('passport-facebook'),
@@ -12,11 +14,13 @@ var express = require('express'),
 
 
 
-//var config = require('./config/config');
-//var pass = require('./config/pass.js')
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+
+// CONFIGURATION
+//var config = require('./config/config');
+//var pass = require('./config/pass.js')
 
 var app = express();
 
@@ -25,20 +29,31 @@ var app = express();
 
 //=======================EXPRESS================================
 // CONFIGURE EXPRESS
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(favicon());
-app.use(logger('combined'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false}));
-app.use(cookieParser());
+// Middleware
+app.use(favicon()); // finding of a URL of a web site's favicon
+app.use(logger('dev')); // why format common & combined do not work?
+app.use(cookieParser()); // parsing Cookie header and populate req.cookies with an object keyed by the cookie names
+app.use(bodyParser.urlencoded({ extended: false})); // return middleware that only parses urlencoded bodies
+app.use(bodyParser.json()); // return middleware that only parses JSON
+app.use(methodOverride('X-HTTP-Method-Override')); // lets use HTTP verbs such as PUT & DELETE in places where a client doesn't support it
+app.use(session({ secret: 'userauth', saveUninitialized: true, resave: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+//===================Routes======================================
 
 app.use('/', routes);
 app.use('/users', users);
 
+
+//==================ERROR HANDLERS===============================
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -70,5 +85,6 @@ app.use(function(err, req, res, next) {
     });
 });
 
+//=================MODULE EXPORTS=================================
 
 module.exports = app;
