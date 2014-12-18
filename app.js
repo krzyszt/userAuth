@@ -1,3 +1,5 @@
+//==================REQUIRE MODULES====================================
+
 var express = require('express'),
     session = require('express-session'),
     path = require('path'),
@@ -13,27 +15,18 @@ var express = require('express'),
     GoogleStartegy = require('passport-google'),
     LocalStrategy = require('passport-local');
 
+//====================LOCAL MODULES=============================
+var routes = require('./routes/index'),
+    users = require('./routes/users');
 
+//=====================CONFIGURATION============================
+var config = require('./config/config'),
+    auth = require('./config/authenticate.js');
 
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
-// CONFIGURATION
-var config = require('./config/config');
-var auth = require('./config/authenticate.js')
-
+//====================EXPRESS APP===============================
 var app = express();
 
-//=======================PASPORT================================
-
-
-//=======================EXPRESS================================
-// CONFIGURE EXPRESS
-
-
-
-// Middleware
+//=======================MIDDLEWARE================================
 app.use(favicon()); // finding of a URL of a web site's favicon
 app.use(logger('dev')); // HTTP request logger middleware  ? why format "common" & "combined" do not work ?
 app.use(cookieParser()); // parsing Cookie header and populate req.cookies with an object keyed by the cookie names
@@ -69,7 +62,7 @@ app.use(function(req,res,next){
     next();
 });
 
-//===========================VIEWS,LAYOUTS ETC==================
+//===========================VIEWS,LAYOUTS,ENGINE==================
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'jade');
@@ -84,7 +77,7 @@ var hbs = expresshbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-//===================PASSPORT STRATEGIES=========================
+//===================PASSPORT=========================
 
 passport.use('local-signup', new LocalStrategy(
     { 
@@ -106,9 +99,7 @@ passport.use('local-signup', new LocalStrategy(
 // ));
 
 
-
-
-//===================Routes======================================
+//===================ROUTES======================================
 
 //displays homepage
 app.get('/', function(req, res){
