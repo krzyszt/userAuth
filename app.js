@@ -20,8 +20,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 // CONFIGURATION
-//var config = require('./config/config');
-//var pass = require('./config/pass.js')
+var config = require('./config/config');
+var auth = require('./config/authenticate.js')
 
 var app = express();
 
@@ -69,8 +69,6 @@ app.use(function(req,res,next){
     next();
 });
 
-
-
 //===========================VIEWS,LAYOUTS ETC==================
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
@@ -86,6 +84,30 @@ var hbs = expresshbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
+//===================PASSPORT STRATEGIES=========================
+
+passport.use('local-signup', new LocalStrategy(
+    { 
+        passReqToCallback: true,
+        usernameField:  "email",
+        passwordField: "password"
+    },
+    function(req, username, password, done){
+        auth.localRegister(req, username, password);
+            
+    }
+));
+
+// passport.use('local-signin', new LocalStrategy(
+//     { passReqToCallback: true},
+//     function(req, username, password, done){
+//         pass.localAuth(username, password);
+//     }
+// ));
+
+
+
+
 //===================Routes======================================
 
 //displays homepage
@@ -96,6 +118,25 @@ app.get('/', function(req, res){
 //displays signup page
 app.get('/signin', function(req, res){
   res.render('signin');
+});
+
+// Requests with passport authentification
+app.post('/local-reg', passport.authenticate('local-signup', {
+    successRedirect: '/',
+    failureRedirect: '/signin'
+}));
+
+// app.post('/login', passport.authenticate('local-signin'),{
+//     successRedirect: '/',
+//     failureRedirect: '/signin'
+// } );
+
+app.get('/logout', function(req,res){
+    var name = req.user.username;
+    console.log('LOGIN OUT ' + req.user.username);
+    req.logout();
+    res.redirect('/');
+    req.session.notice = "You have successfully been loged out " + name + "!";
 });
 
 
