@@ -20,7 +20,7 @@ var routes = require('./routes/index'),
     users = require('./routes/users');
 
 //=====================CONFIGURATION============================
-var config = require('./config/config'),
+var config = require('./config/config')('development'),
     auth = require('./config/authenticate.js');
 
 //====================EXPRESS APP===============================
