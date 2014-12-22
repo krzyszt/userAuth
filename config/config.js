@@ -24,4 +24,4 @@ process.on('SIGIN', function(){
 });
 
 //====================== Mongoose Models =======================================
-
+require('../models/User');
